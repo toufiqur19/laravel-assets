@@ -1,0 +1,118 @@
+// create table and file//
+1. Create Model & Category table:
+	php artisan make:model Category
+
+2. Create Model & Post table:
+	php artisan make:model Post
+
+3. ResourceCategory file:
+	php artisan make:filament-resource Category --simple --generate
+
+4. ResourcePost file:
+	php artisan make:filament-resource Post --simple --generate
+
+// working table and file//
+
+5. catagories.php:
+	 $table->id();
+         $table->string('title');
+         $table->string('slug')->unique();
+         $table->timestamps();	
+
+6. posts.php:
+	$table->id();
+        $table->string('image')->nullable();
+        $table->string('title');
+        $table->string('slug')->unique();
+        $table->string('short_desc');
+        $table->boolean('published')->default(false);
+        $table->text('description')->nullable();
+        $table->dateTime('published_at');
+        $table->json('tags')->nullable();
+        $table->foreignId('category_id')->constrained()->cascadeOnDelete();
+        $table->timestamps();
+
+7. CategoryResource.php:
+	1. ->schema([
+                TextInput::make('title')
+                    ->required(),
+                TextInput::make('slug')
+                    ->required(),
+            ]);
+	2. ->columns([
+                TextColumn::make('title')
+                    ->searchable(),
+                TextColumn::make('slug')
+                    ->searchable(),
+            ])
+
+8. PostResource.php:
+	1. ->schema([
+                TextInput::make('title')->required(),
+                TextInput::make('slug')->required(),
+                Select::make('category_id')
+                ->label('Category')
+                ->options(Category::all()->pluck('title','id')),
+                MarkdownEditor::make('description')->required(),
+                TagsInput::make('tags')->required(),
+                FileUpload::make('image'),
+                TextInput::make('short_desc')->required(),
+                DatePicker::make('published_at'),
+                Checkbox::make('published')->required(),
+            ]);
+
+	2. ->columns([
+                ImageColumn::make('image')
+                    ->searchable(),
+                TextColumn::make('title')
+                    ->searchable(),
+                TextColumn::make('tags'),
+                TextColumn::make('category.title'),
+                CheckboxColumn::make('published'),
+                TextColumn::make('short_desc')
+                    ->searchable(),
+                // TextColumn::make('description')
+                //     ->searchable(),
+                TextColumn::make('published_at')
+                    ->dateTime(),
+                TextColumn::make('updated_at')
+                    ->dateTime(),
+            ])
+
+9. EditPost & ListPost.php (PostResource):
+	protected function getHeaderActions(): array
+    	{
+            return [
+            	Actions\CreateAction::make(),
+              ];
+    	}
+
+10. Category.php (Model file):
+	protected $fillable = ['title','slug'];
+
+    	public function posts()
+    	{
+        return $this->belongsToMany(Post::class);
+    	}
+
+10. Post.php (Model file):
+	protected $fillable = [
+        'image',
+        'title',
+        'slug',
+        'short_desc',
+        'published',
+        'published_at',
+        'description',
+        'published_at',
+        'tags',
+        'category_id',
+    	];
+
+    	protected $casts = [
+         'tags' => 'array',
+    	];
+
+    	public function category(){
+       	 return $this->belongsTo(Category::class);
+    	}
