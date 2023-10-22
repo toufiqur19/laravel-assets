@@ -1,0 +1,22 @@
+1. php artisan make:livewire ShowService 
+2. ShowService.php (livewire):
+    public $service;
+    public function mount($id){
+        $this->service = Service::findOrFail($id);
+    }
+    public function render()
+    {
+        return view('livewire.show-service',[
+            'service' => $this->service
+        ]);
+    }
+
+3. web.php (route):
+	Route::get('/service/{id}',ShowService::class)->name('servicesDetals');
+
+4. show-service.blade.php (views/livewire):
+	<div class="col-lg-12">
+            <div class="content">
+               {!! $service-> description !!}					
+             </div>
+         </div>
