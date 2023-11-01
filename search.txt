@@ -1,0 +1,33 @@
+https://livewire.laravel.com/docs/pagination
+1.	<?php
+ 
+	namespace App\Livewire;
+ 
+	use Livewire\WithPagination;
+	use Livewire\Component;
+	use App\Models\Post;
+ 
+	class SearchPosts extends Component
+	{
+    	use WithPagination;
+ 
+    	public $query = '';
+ 
+    	public function search()
+   	{
+        $this->resetPage();
+    	}
+ 
+    	public function render()
+    	{
+        return view('show-posts', [
+            'posts' => Post::where('title', 'like', '%'.$this->query.'%')->paginate(10),
+        ]);
+    	}
+	}
+
+2.	<form wire:submit="search">
+            <input type="text" wire:model="query">
+ 
+            <button type="submit">Search posts</button>
+    	</form>

@@ -1,0 +1,41 @@
+1. livewire post file(BlogPage.php):
+	1. use Livewire\Attributes\Url;
+	2. #[Url]
+   	   public $categorySlug = null;
+	   
+	public function render()
+    	{
+       	$categories = Category::all();
+        if(!empty($this->categorySlug))
+        {
+            $category = Category::where('slug',$this->categorySlug)->first();
+            if(empty($category))
+            {
+                abort(404);
+            }
+            $articles = Post::orderBy('published_at','DESC')
+                        ->where('category_id',$category->id)
+                        ->paginate(4);
+        }
+        else
+        {
+            $articles = Post::orderBy('published_at','DESC')
+                        ->where('title', 'like', '%'.$this->query.'%')->paginate(4);
+        }
+        
+        return view('livewire.blog-page',
+        [
+            'articles' => $articles,
+            'categories' => $categories
+        ]);
+    	}
+
+2. livewire blade file (blog-page.blade.php):
+	 @if ($categories->isNotEmpty())
+           @foreach ($categories as $category)
+            <ul class="list-unstyled widget-list categories">			
+              <li><a wire:navigate href="{{route('blogPage').'?categorySlug='.$category->slug}}">{{$category->title}}</a></li>
+            </ul>  
+           @endforeach                           
+         @endif
+	
