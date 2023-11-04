@@ -1,0 +1,11 @@
+Gate-policy
+facades
+events
+queue 
+laravel lifecycle
+Server container provider
+blade directive
+php multi inheritence suport
+what is object class
+trait
+magic math

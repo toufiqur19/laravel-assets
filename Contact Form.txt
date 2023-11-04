@@ -1,0 +1,65 @@
+1. contract.blade.php :
+	<div class="col-lg-6">
+           @if(session('message'))
+              <h6 class="alert alert-success">
+                  {{ session('message') }}
+              </h6>
+           @endif
+
+           <form wire:submit.prevent="submit">
+               <div class="form-group">
+                  <label>Name</label>
+                  <input type="text" class="form-control" id="exampleInputName" placeholder="Enter name" wire:model="name">
+                   @error('name') 
+                     <span class="text-danger">{{ $message }}</span> 
+                   @enderror
+                </div>
+                <div class="form-group"><label>Email</label>
+                    <input type="text" class="form-control" id="exampleInputEmail" placeholder="Enter name" wire:model="email">
+                      @error('email') 
+                        <span class="text-danger">{{ $message }}</span>
+                      @enderror
+                </div>
+                <div class="form-group"><label>Body</label>
+                     <textarea class="form-control" id="exampleInputbody" placeholder="Enter Body" wire:model="body"></textarea>
+                       @error('body') 
+                         <span class="text-danger">{{ $message }}</span> 
+                       @enderror
+                </div>
+                  <button type="submit" class="btn btn-primary">Save Contact</button>
+            </form>
+         </div>
+
+2. ContractPage.php (livewire):
+	<?php
+
+	namespace App\Livewire;
+
+	use App\Models\Contact;
+	use Livewire\Component;
+
+	class ContractPage extends Component
+	{
+    		public $name;
+    		public $email;
+    		public $body;
+    	public function submit()
+    	{
+        	$validatedData = $this->validate(['name' 
+        	=> 'required|min:6','email' 
+        	=> 'required|email','body' 
+       		 => 'required',]);
+        	Contact::create($validatedData);
+        	return redirect()->to('contract')->with('message',"This is Success Message");
+    	}
+    	public function render()
+    	{
+        	return view('livewire.contract-page');
+    	}
+	}
+
+3. Contract.php(Models):
+	protected $fillable = ['name', 'email', 'body',];
+
+4. Route:
+	Route::get('/contract',ContractPage::class)->name('contractPage');
