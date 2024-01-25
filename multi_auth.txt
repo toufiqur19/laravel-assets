@@ -1,0 +1,52 @@
+1. create controller:
+	=> php artisan make:controller AdminController
+
+2. web.php:
+	Route::get('/admin',[AdminController::class,'admin'])->name('admin');
+
+3. create admin blade file(admin.blade.php)
+
+4.create multi_auth commend - (follow this path file):
+	=> app/Http/controlller/Auth/AuthenticatedSessionController
+
+	=> public function store(LoginRequest $request): RedirectResponse
+    	{
+        	$request->authenticate();
+
+        	$request->session()->regenerate();
+
+        	$url = '';
+        	if($request->user()->role === 'admin')
+        	{
+           	 $url = 'admin';
+        	}
+        	elseif($request->user()->role === 'admin')
+        	{
+            	$url = '/';
+        	}
+        	return redirect()->intended($url);
+    	}	
+
+5. create middleware:
+	=> php artisan make:middleware Admin
+
+6. reegister adminMiddleware - (Kernel.php file):
+	=>protected $middlewareAliases = [
+        'admin' => \App\Http\Middleware\admin::class,
+    	];
+
+7. commend - (Middleware\ admin.php file):
+	=>public function handle(Request $request, Closure $next, $admin)
+    	{
+
+        if($request->user()->role !== $admin)
+        {
+            return redirect('/');
+        }
+        return $next($request);
+   	 }
+
+8. execution middlewate in (web.php) file:
+	=> Route::middleware('auth','admin:admin')->group(function () {
+    	Route::get('/admin',[AdminController::class,'admin'])->name('admin');
+	});
