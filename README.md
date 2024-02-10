@@ -8,3 +8,7 @@ Clone or download repository then:
 6. run : php artisan key:generate
 7. run : php artisan migrate:fresh --seed
 8. run : php artisan serve
+
+
+** Table Column rename or datatype chang:
+library-run : composer require doctrine/dbal
